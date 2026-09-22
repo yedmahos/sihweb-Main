@@ -1,0 +1,460 @@
+import React, { useState, useEffect } from 'react';
+import {
+  ShieldAlert,
+  IndianRupee,
+  Clock,
+  Activity,
+  ArrowRight,
+  CheckCircle2,
+  ChevronRight,
+  Zap,
+  MapPin,
+  Cpu,
+  Flame,
+  FileText,
+  ListOrdered
+} from 'lucide-react';
+import { LoadingSkeleton } from '../ui/LoadingSkeleton';
+import { EmptyState } from '../ui/EmptyState';
+import { ApiService } from '../../services/api';
+import { PipelineStats, IncidentSummary, IncidentDetail } from '../../types';
+
+import { CommandHeroBanner } from './CommandHeroBanner';
+import { NavPage } from '../layout/AppShell';
+
+interface CommandCenterProps {
+  onSelectCase: (id: string) => void;
+  onNavigate?: (page: NavPage) => void;
+}
+
+const formatCurrency = (amount: number): string => {
+  if (amount >= 10000000) {
+    return `₹${(amount / 10000000).toFixed(2)}Cr`;
+  }
+  if (amount >= 100000) {
+    return `₹${(amount / 100000).toFixed(2)}L`;
+  }
+  return `₹${amount.toLocaleString('en-IN')}`;
+};
+
+export const CommandCenter: React.FC<CommandCenterProps> = ({ onSelectCase, onNavigate }) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<PipelineStats | null>(null);
+  const [incidents, setIncidents] = useState<IncidentSummary[]>([]);
+  const [tierFilter, setTierFilter] = useState<string>('ALL');
+  const [sortMode, setSortMode] = useState<'SERIAL' | 'RISK'>('SERIAL');
+  const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
+  const [incidentDetail, setIncidentDetail] = useState<IncidentDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const [statsData, incidentsResult] = await Promise.all([
+          ApiService.getPipelineStats(),
+          ApiService.getIncidents({ page: 1, page_size: 1000 })
+        ]);
+        
+        setStats(statsData);
+        let items = incidentsResult.items || [];
+
+        if (items.length > 0) {
+          setIncidents(items);
+          const topId = items[0].complaint_id;
+          setSelectedIncidentId(topId);
+          fetchDetail(topId);
+        }
+      } catch (err) {
+        setError('Investigation data unavailable - backend unreachable');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  const fetchDetail = async (id: string) => {
+    try {
+      setDetailLoading(true);
+      const detail = await ApiService.getIncidentDetail(id);
+      setIncidentDetail(detail);
+    } catch (err) {
+        setError('Investigation data unavailable - backend unreachable');
+        console.error(err);
+      } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const handleSelectIncident = (id: string) => {
+    setSelectedIncidentId(id);
+    fetchDetail(id);
+  };
+
+  let filteredIncidents = incidents.filter((inc) => {
+    if (tierFilter !== 'ALL' && inc.confidence_tier !== tierFilter) return false;
+    return true;
+  });
+
+  if (sortMode === 'SERIAL') {
+    filteredIncidents.sort((a, b) => {
+      const numA = parseInt(a.complaint_id.replace(/\D/g, ''), 10) || 0;
+      const numB = parseInt(b.complaint_id.replace(/\D/g, ''), 10) || 0;
+      return numA - numB;
+    });
+  } else {
+    filteredIncidents.sort((a, b) => (b.graphsage_risk_probability || 0) - (a.graphsage_risk_probability || 0));
+  }
+
+  const highRiskExposure = incidents
+    .filter(i => i.confidence_tier === 'HIGH_CONFIDENCE')
+    .reduce((acc, curr) => acc + (curr.reported_amount || 0), 0);
+
+  return (
+    <div className="space-y-4 font-sans">
+      {error && <div className="bg-red-50 p-4 m-4 rounded-xl border border-red-200 text-red-600 font-bold text-sm z-50">{error}</div>}
+      {/* ── IMMERSIVE COMMAND HERO BANNER ── */}
+      <CommandHeroBanner onNavigate={onNavigate} />
+
+      {/* ── TOP KPI STRIP (5 METRIC TILES) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 font-sans">
+        <div className="bg-white border border-black/[0.06] px-5 py-4 rounded-3xl space-y-2 shadow-saas-card">
+          <div className="text-[11px] text-[#6B7078] font-medium flex items-center justify-between">
+            <span>HIGH-RISK ALERTS</span>
+            <span className="text-[#FF3D3D] font-bold">+14% VEL</span>
+          </div>
+          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-[#EA580C]">
+            {stats ? stats.tier_breakdown.HIGH_CONFIDENCE : '142'}
+          </div>
+          <div className="text-[10px] text-slate-500">ACTIVE SUSPECT CHAINS</div>
+        </div>
+
+        <div className="bg-white border border-black/[0.06] px-5 py-4 rounded-3xl space-y-2 shadow-saas-card">
+          <div className="text-[11px] text-[#6B7078] font-medium flex items-center justify-between">
+            <span>MULE SYNDICATES</span>
+            <span className="text-amber-400 font-bold">72H WIN</span>
+          </div>
+          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-[#059669]">
+            48 RINGS
+          </div>
+          <div className="text-[10px] text-slate-500">COORDINATED GRAPH TOPOLOGY</div>
+        </div>
+
+        <div className="bg-white border border-black/[0.06] px-5 py-4 rounded-3xl space-y-2 shadow-saas-card">
+          <div className="text-[11px] text-[#6B7078] font-medium flex items-center justify-between">
+            <span>CASH-OUT EXPOSURE</span>
+            <span className="text-amber-400 font-bold">PRIORITY</span>
+          </div>
+          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-[#2563EB]">
+            {formatCurrency(highRiskExposure || 0)}
+          </div>
+          <div className="text-[10px] text-slate-500">ESTIMATED LAUNDERED SUM</div>
+        </div>
+
+        <div className="bg-white border border-black/[0.06] px-5 py-4 rounded-3xl space-y-2 shadow-saas-card">
+          <div className="text-[11px] text-[#6B7078] font-medium flex items-center justify-between">
+            <span>TRIAGE QUEUE</span>
+            <span className="text-slate-700 font-bold">SLA &lt; 2H</span>
+          </div>
+          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-[#7C3AED]">
+            {stats ? stats.tier_breakdown.MEDIUM_CONFIDENCE : '218'}
+          </div>
+          <div className="text-[10px] text-slate-500">AWAITING INVESTIGATOR</div>
+        </div>
+
+        <div className="bg-white border border-black/[0.06] px-5 py-4 rounded-3xl space-y-2 shadow-saas-card">
+          <div className="text-[11px] text-[#6B7078] font-medium flex items-center justify-between">
+            <span>GNN F1 ACCURACY</span>
+            <span className="text-emerald-400 font-bold">MRR 1.0</span>
+          </div>
+          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-[#EA580C]">
+            90.14%
+          </div>
+          <div className="text-[10px] text-slate-500">GraphSAGE INDUCTIVE TEST</div>
+        </div>
+      </div>
+
+      {/* ── MAIN 2-COLUMN WORKSPACE ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 min-h-[500px]">
+        
+        {/* LEFT COLUMN: PRIORITY INCIDENT FEED (7 COLS) */}
+        <div className="lg:col-span-7 flex flex-col bg-white border border-black/[0.06] rounded-3xl p-4 md:p-5 shadow-saas-card">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3 mb-2 font-sans">
+            <div>
+              <h2 className="text-xs font-bold tracking-tight text-slate-900 uppercase flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-[#FF3D3D]" />
+                <span>INCIDENT QUEUE // {sortMode === 'SERIAL' ? 'SERIAL ORDER (C001➔)' : 'HIGHEST RISK FIRST'}</span>
+              </h2>
+              <div className="text-[10px] text-slate-500">
+                {filteredIncidents.length} CASES IN ACTIVE REGISTRY
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {/* Sort Switcher */}
+              <div className="flex border border-slate-200 bg-slate-50 rounded-full p-1 text-[11px]">
+                <button
+                  onClick={() => setSortMode('SERIAL')}
+                  className={`px-2 py-0.5 rounded font-bold flex items-center gap-1 transition-colors ${
+                    sortMode === 'SERIAL'
+                      ? 'bg-white text-black shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                  title="Sort in serial order: C000001, C000002, C000003..."
+                >
+                  <ListOrdered className="w-3 h-3" />
+                  <span>SERIAL</span>
+                </button>
+
+                <button
+                  onClick={() => setSortMode('RISK')}
+                  className={`px-2 py-0.5 rounded font-bold flex items-center gap-1 transition-colors ${
+                    sortMode === 'RISK'
+                      ? 'bg-white text-[#1E1E1E] shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                  title="Sort by risk"
+                >
+                  <Flame className="w-3 h-3" />
+                  <span>RISK</span>
+                </button>
+              </div>
+
+              {/* Filter Tabs */}
+              <div className="flex border border-slate-200 bg-slate-50 rounded-full p-1 text-[11px]">
+                {['ALL', 'HIGH_CONFIDENCE', 'MEDIUM_CONFIDENCE', 'NORMAL'].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTierFilter(t)}
+                    className={`px-2 py-0.5 rounded font-bold transition-colors ${
+                      tierFilter === t
+                        ? 'bg-white text-black shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    {t === 'ALL' ? 'ALL' : t === 'HIGH_CONFIDENCE' ? 'CRITICAL' : t === 'MEDIUM_CONFIDENCE' ? 'SUSPICIOUS' : 'CLEARED'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* List Feed */}
+          <div className="flex-1 overflow-y-auto max-h-[460px] divide-y divide-white/5 font-sans">
+            {loading ? (
+              <div className="p-4 space-y-2">
+                <LoadingSkeleton variant="table-row" count={6} />
+              </div>
+            ) : filteredIncidents.length === 0 ? (
+              <div className="p-8">
+                <EmptyState title="No incidents" description="No cases match the selected filter." />
+              </div>
+            ) : (
+              filteredIncidents.map((incident) => {
+                const isSelected = selectedIncidentId === incident.complaint_id;
+                const isHigh = incident.confidence_tier === 'HIGH_CONFIDENCE';
+                const isMedium = incident.confidence_tier === 'MEDIUM_CONFIDENCE';
+
+                return (
+                  <div
+                    key={incident.complaint_id}
+                    onClick={() => handleSelectIncident(incident.complaint_id)}
+                    className={`p-2.5 transition-all cursor-pointer flex items-center justify-between gap-3 text-xs rounded ${
+                      isSelected
+                        ? 'bg-slate-100 border-l-2 border-l-[#FF3D3D] text-slate-900'
+                        : 'hover:bg-white/[0.03] text-slate-700'
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="font-bold text-slate-900 text-[11px] relative">
+                          {incident.complaint_id}
+                          {incident.intercepted_in_flight && (
+                            <span className="absolute -top-1 -right-1 flex h-1.5 w-1.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
+                            </span>
+                          )}
+                        </span>
+                        <span className={`text-[9px] px-1 py-0.2 rounded font-bold border ${
+                          incident.trigger_source === 'DYNAMIC_ANOMALY' ? 'bg-amber-500/10 text-amber-500 border-amber-500/30' : 'bg-cyan-500/10 text-cyan-400 border-black/[0.06]'
+                        }`}>
+                          {incident.trigger_source === 'DYNAMIC_ANOMALY' ? 'AUTO' : 'CITIZEN'}
+                        </span>
+                        <span className={`text-[9px] px-1.5 py-0.2 rounded border font-bold ${
+                          isHigh ? 'bg-[#FF3D3D]/15 text-[#FF3D3D] border-[#FF3D3D]/30' : isMedium ? 'bg-amber-500/15 text-amber-400 border-amber-500/30' : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                        }`}>
+                          {incident.confidence_tier}
+                        </span>
+                        {incident.top_terminal_city && incident.top_terminal_city !== 'NONE' && (
+                          <span className="text-[9px] text-amber-400">
+                            ➔ {incident.top_terminal_city}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-slate-500 truncate">
+                        {incident.scam_category || 'Commercial Transfer Flow'}
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <div className="font-bold text-slate-900 font-sans">
+                        ₹{(incident.reported_amount || 0).toLocaleString('en-IN')}
+                      </div>
+                      <div className="text-[9px] text-slate-500">DISPUTED</div>
+                    </div>
+
+                    <div className="w-20 text-right">
+                      <div className={`font-bold text-xs ${isHigh ? 'text-[#FF3D3D]' : isMedium ? 'text-amber-400' : 'text-emerald-400'}`}>
+                        {(incident.graphsage_risk_probability * 100).toFixed(1)}%
+                      </div>
+                      <div className="w-full h-1 bg-slate-100 rounded mt-0.5 overflow-hidden">
+                        <div
+                          className={`h-full ${isHigh ? 'bg-[#FF3D3D]' : isMedium ? 'bg-amber-400' : 'bg-emerald-400'}`}
+                          style={{ width: `${incident.graphsage_risk_probability * 100}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectCase(incident.complaint_id);
+                      }}
+                      className="px-2.5 py-1 bg-slate-100 hover:bg-slate-100 text-slate-900 border border-slate-200 rounded text-[10px] font-bold flex items-center gap-1 transition-colors"
+                    >
+                      <span>DOSSIER</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN: "WHY FLAGGED?" EXPLAINABILITY PANEL (5 COLS) */}
+        <div className="lg:col-span-5 flex flex-col bg-white border border-black/[0.06] rounded-3xl p-4 md:p-5 shadow-saas-card font-sans text-xs">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-3 mb-3">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-[#FF3D3D]" />
+              <div>
+                <h2 className="text-xs font-bold tracking-tight text-slate-900 uppercase">
+                  "WHY FLAGGED?" // GNN EXPLAINABILITY
+                </h2>
+                <div className="text-[9px] text-slate-500">DECISION RATIONALE & EVIDENCE</div>
+              </div>
+            </div>
+
+            <span className="text-[9px] bg-[#FF3D3D]/10 border border-[#FF3D3D]/30 text-[#FF3D3D] px-2 py-0.5 rounded font-bold">
+              HUMAN REVIEW
+            </span>
+          </div>
+
+          <div className="flex-1 overflow-y-auto space-y-3">
+            {(() => {
+              const selectedIncident = incidents.find(i => i.complaint_id === selectedIncidentId);
+              if (detailLoading) {
+                return (
+                  <div className="space-y-2">
+                    <LoadingSkeleton variant="text" count={6} />
+                  </div>
+                );
+              }
+              if (!incidentDetail) return null;
+              return (
+                <>
+                {/* Executive Summary Card */}
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded space-y-1">
+                  <div className="text-[10px] text-slate-500 font-bold flex items-center gap-1.5 uppercase">
+                    <FileText className="w-3 h-3 text-[#FF3D3D]" />
+                    <span>EXECUTIVE SUMMARY</span>
+                  </div>
+                  <p className="text-[11px] text-slate-700 leading-relaxed font-sans">
+                    {incidentDetail.model_prediction.executive_summary ||
+                      `GraphSAGE model evaluated complaint ${incidentDetail.complaint.complaint_id}. Anomalous subgraph topology detected indicative of structured layering across intermediate mule accounts.`}
+                  </p>
+                </div>
+
+                {/* Risk & Terminal Details */}
+                <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 border border-slate-200 rounded text-[10px]">
+                  <div className="space-y-1">
+                    <div className="text-slate-500">GRAPHSAGE RISK SCORE:</div>
+                    <div className="text-xl font-bold font-sans text-slate-900">
+                      {(((selectedIncident?.graphsage_risk_probability !== undefined ? selectedIncident.graphsage_risk_probability : incidentDetail.model_prediction.graphsage_risk_probability) || 0) * 100).toFixed(1)}%
+                    </div>
+                    <div className={`text-[9px] font-bold ${
+                      (selectedIncident?.confidence_tier || incidentDetail.model_prediction.confidence_tier) === 'HIGH_CONFIDENCE'
+                        ? 'text-[#FF3D3D]'
+                        : (selectedIncident?.confidence_tier || incidentDetail.model_prediction.confidence_tier) === 'MEDIUM_CONFIDENCE'
+                        ? 'text-amber-400'
+                        : 'text-emerald-400'
+                    }`}>
+                      {selectedIncident?.confidence_tier || incidentDetail.model_prediction.confidence_tier}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="text-slate-500">PREDICTED EXIT TERMINAL:</div>
+                    <div className="text-sm font-bold text-amber-400">
+                      {incidentDetail.model_prediction.top_terminal_id && incidentDetail.model_prediction.top_terminal_id !== 'NONE'
+                        ? incidentDetail.model_prediction.top_terminal_id
+                        : 'N/A'}
+                    </div>
+                    <div className="text-slate-500 truncate">
+                      {incidentDetail.model_prediction.top_terminal_city && incidentDetail.model_prediction.top_terminal_city !== 'NONE'
+                        ? incidentDetail.model_prediction.top_terminal_city
+                        : 'No Exit Convergence'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Evidence Bullets */}
+                <div className="space-y-1.5">
+                  <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                    INVESTIGATIVE EVIDENCE BULLETS:
+                  </div>
+                  <div className="space-y-1 text-[10px] text-slate-700">
+                    {(incidentDetail.investigative_evidence_bullets && incidentDetail.investigative_evidence_bullets.length > 0
+                      ? incidentDetail.investigative_evidence_bullets
+                      : [
+                          `GraphSAGE risk probability evaluated at ${((incidentDetail.model_prediction.graphsage_risk_probability || 0) * 100).toFixed(2)}%.`,
+                          `Disputed amount of ₹${(incidentDetail.complaint.reported_amount || 0).toLocaleString('en-IN')}.`,
+                        ]
+                    ).map((bullet, idx) => (
+                      <div key={idx} className="flex items-start gap-2 bg-slate-50 p-2 border border-slate-100 rounded">
+                        <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${
+                          incidentDetail.model_prediction.confidence_tier === 'HIGH_CONFIDENCE'
+                            ? 'text-[#FF3D3D]'
+                            : incidentDetail.model_prediction.confidence_tier === 'MEDIUM_CONFIDENCE'
+                            ? 'text-amber-400'
+                            : 'text-emerald-400'
+                        }`} />
+                        <span className="leading-snug text-slate-700 font-sans">{bullet}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Case Link */}
+                <button
+                  onClick={() => onSelectCase(incidentDetail.complaint.complaint_id)}
+                  className="w-full h-10 bg-[#FF3D3D] hover:bg-[#078A22] text-white font-medium text-xs rounded-full flex items-center justify-center gap-2 transition-colors"
+                >
+                  <span>OPEN FULL CLASSIFIED CASE DOSSIER</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </>
+            );
+          })()}
+        </div>
+      </div>
+
+      </div>
+    </div>
+  );
+};
