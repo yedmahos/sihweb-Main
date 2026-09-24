@@ -13,6 +13,7 @@ import {
 import { LoadingSkeleton } from '../ui/LoadingSkeleton';
 import { EmptyState } from '../ui/EmptyState';
 import { ApiService } from '../../services/api';
+import { tierBadgeClass, tierBarClass, tierTextClass } from '../../lib/signal';
 import { InputValidator } from '../../utils/validation';
 import { IncidentSummary } from '../../types';
 
@@ -248,14 +249,14 @@ export const IncidentQueue: React.FC<IncidentQueueProps> = ({ onSelectCase }) =>
                       <td className="p-3 font-bold text-slate-900 relative">
                         {incident.complaint_id}
                         {incident.intercepted_in_flight && (
-                          <div className="absolute -top-1 -right-2 text-[8px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-1 py-0.5 rounded shadow whitespace-nowrap">
+                          <div className="absolute -top-1 -right-2 text-[8px] bg-signal-orange/15 text-signal-orange border border-signal-orange/40 px-1 py-0.5 rounded shadow whitespace-nowrap">
                             Intercepted In-Flight
                           </div>
                         )}
                       </td>
                       <td className="p-3">
                         <div className="flex flex-col gap-1">
-                          <span className={`text-[9px] px-1.5 py-0.5 w-fit rounded font-bold border ${isAuto ? 'bg-amber-500/10 text-amber-500 border-amber-500/30' : 'bg-cyan-500/10 text-cyan-400 border-black/[0.06]'}`}>
+                          <span className={`text-[9px] px-1.5 py-0.5 w-fit rounded font-bold border ${isAuto ? 'bg-signal-amber/10 text-signal-amber border-signal-amber/30' : 'bg-signal-cyan/10 text-signal-cyan border-signal-cyan/30'}`}>
                             {isAuto ? '[AUTO-SPAWNED ANOMALY]' : '[CITIZEN COMPLAINT]'}
                           </span>
                           {isAuto && incident.anomaly_reason && (
@@ -276,12 +277,12 @@ export const IncidentQueue: React.FC<IncidentQueueProps> = ({ onSelectCase }) =>
                       </td>
                       <td className="p-3">
                         <div className="flex items-center gap-2">
-                          <span className={`font-bold ${isHigh ? 'text-[#FF3D3D]' : isMedium ? 'text-amber-400' : 'text-emerald-400'}`}>
+                          <span className={`font-bold ${tierTextClass(isHigh, isMedium)}`}>
                             {(incident.graphsage_risk_probability * 100).toFixed(1)}%
                           </span>
                           <div className="w-12 bg-slate-100 h-1 rounded overflow-hidden">
                             <div
-                              className={`h-full ${isHigh ? 'bg-[#FF3D3D]' : isMedium ? 'bg-amber-400' : 'bg-emerald-400'}`}
+                              className={`h-full ${tierBarClass(isHigh, isMedium)}`}
                               style={{ width: `${incident.graphsage_risk_probability * 100}%` }}
                             />
                           </div>
@@ -289,14 +290,14 @@ export const IncidentQueue: React.FC<IncidentQueueProps> = ({ onSelectCase }) =>
                       </td>
                       <td className="p-3">
                         <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${
-                          isHigh ? 'bg-[#FF3D3D]/15 text-[#FF3D3D] border border-[#FF3D3D]/30' : isMedium ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                          tierBadgeClass(isHigh, isMedium)
                         }`}>
                           {incident.confidence_tier}
                         </span>
                       </td>
                       <td className="p-3">
                         {incident.top_terminal_id && incident.top_terminal_id !== 'NONE' ? (
-                          <div className="text-amber-400 text-[11px] font-bold">
+                          <div className="text-signal-exit text-[11px] font-bold">
                             {incident.top_terminal_id} <span className="text-slate-500 font-normal">({incident.top_terminal_city || 'City'})</span>
                           </div>
                         ) : (

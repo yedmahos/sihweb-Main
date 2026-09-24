@@ -14,24 +14,24 @@ interface KPICardProps {
 
 const colorMap = {
   cyan: {
-    dot: 'bg-[#FF3D3D]',
-    icon: 'bg-[#E8F7EC] text-[#078A22]',
-    val: 'text-[#1E1E1E]',
+    dot: 'bg-signal-cyan',
+    icon: 'bg-signal-cyan/15 text-signal-cyan',
+    val: 'text-signal-cyan',
   },
   red: {
-    dot: 'bg-[#FF3D3D]',
-    icon: 'bg-[#FFF1F1] text-[#FF3D3D]',
-    val: 'text-[#FF3D3D]',
+    dot: 'bg-signal-red',
+    icon: 'bg-signal-red/10 text-signal-red',
+    val: 'text-signal-red',
   },
   amber: {
-    dot: 'bg-[#FF3D3D]',
-    icon: 'bg-[#FFF1F1] text-[#FF3D3D]',
-    val: 'text-[#FF3D3D]',
+    dot: 'bg-signal-amber',
+    icon: 'bg-signal-amber/15 text-signal-amber',
+    val: 'text-signal-amber',
   },
   green: {
-    dot: 'bg-[#FF3D3D]',
-    icon: 'bg-[#E8F7EC] text-[#078A22]',
-    val: 'text-[#FF3D3D]',
+    dot: 'bg-signal-emerald',
+    icon: 'bg-signal-emerald/15 text-signal-emerald',
+    val: 'text-signal-emerald',
   },
   white: {
     dot: 'bg-[#1E1E1E]',
@@ -67,8 +67,8 @@ export const KPICard: React.FC<KPICardProps> = ({
         </div>
         {trend && (
           <span className={`text-[11px] font-medium ${
-            trend.direction === 'up' ? 'text-[#FF3D3D]' :
-            trend.direction === 'down' ? 'text-[#FF3D3D]' : 'text-[#6B7078]'
+            trend.direction === 'up' ? 'text-signal-orange' :
+            trend.direction === 'down' ? 'text-signal-amber' : 'text-[#6B7078]'
           }`}>
             {trend.direction === 'up' ? '▲' : trend.direction === 'down' ? '▼' : '■'} {trend.text}
           </span>

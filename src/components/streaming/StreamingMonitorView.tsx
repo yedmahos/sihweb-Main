@@ -209,10 +209,10 @@ export const StreamingMonitorView: React.FC = () => {
   }, [filteredEvents, page, pageSize]);
 
   const latencyData = [
-    { metric: 'p50 Median', latency: bench?.p50_latency_ms || 0.70, fill: '#FF3D3D' },
-    { metric: 'p90 90th', latency: bench?.p90_latency_ms || 1.45, fill: '#1E1E1E' },
-    { metric: 'p95 95th', latency: bench?.p95_latency_ms || 2.15, fill: '#FF8A8A' },
-    { metric: 'p99 99th', latency: bench?.p99_latency_ms || 3.40, fill: '#FF3D3D' }
+    { metric: 'p50 Median', latency: bench?.p50_latency_ms || 0.70, fill: '#38BDF8' },
+    { metric: 'p90 90th', latency: bench?.p90_latency_ms || 1.45, fill: '#22D3EE' },
+    { metric: 'p95 95th', latency: bench?.p95_latency_ms || 2.15, fill: '#38BDF8' },
+    { metric: 'p99 99th', latency: bench?.p99_latency_ms || 3.40, fill: '#22D3EE' }
   ];
 
   const windowData = [
@@ -230,10 +230,10 @@ export const StreamingMonitorView: React.FC = () => {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 text-[11px] font-medium bg-[#E8F7EC] text-[#078A22] border border-[#FF3D3D]/15 rounded-full">
+            <span className="px-2.5 py-1 text-[11px] font-medium bg-signal-orange/10 text-signal-orange border border-signal-orange/25 rounded-full">
               Simulation 1 • Live Ingestion & Auto-Triage Engine
             </span>
-            <span className="text-xs text-slate-400 font-mono">Sub-50ms SLA SLA-01</span>
+            <span className="text-xs text-signal-cyan font-mono">Sub-50ms SLA SLA-01</span>
           </div>
           <h2 className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2 mt-1">
             <Zap className="w-5 h-5 text-[#FF3D3D]" />
@@ -321,10 +321,10 @@ export const StreamingMonitorView: React.FC = () => {
           <div className="bg-slate-50 border border-black/[0.06] rounded-2xl p-3.5 space-y-2">
             <div className="flex items-center justify-between text-xs font-bold">
               <span className="text-slate-700 flex items-center gap-1.5">
-                <ShieldAlert className="w-3.5 h-3.5 text-red-500" />
+                <ShieldAlert className="w-3.5 h-3.5 text-signal-red" />
                 High-Risk Alert Cutoff (τ):
               </span>
-              <span className="font-mono text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200">
+              <span className="font-mono text-signal-red bg-signal-red/10 px-2 py-0.5 rounded border border-signal-red/30">
                 {(riskCutoff * 100).toFixed(0)}%
               </span>
             </div>
@@ -335,7 +335,7 @@ export const StreamingMonitorView: React.FC = () => {
               step="0.05"
               value={riskCutoff}
               onChange={(e) => setRiskCutoff(parseFloat(e.target.value))}
-              className="w-full accent-[#FF3D3D] cursor-pointer"
+              className="w-full accent-signal-red cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-slate-400 font-mono">
               <span>30% (High Sensitivity)</span>
@@ -348,10 +348,10 @@ export const StreamingMonitorView: React.FC = () => {
           <div className="bg-slate-50 border border-black/[0.06] rounded-2xl p-3.5 space-y-2">
             <div className="flex items-center justify-between text-xs font-bold">
               <span className="text-slate-700 flex items-center gap-1.5">
-                <Eye className="w-3.5 h-3.5 text-blue-500" />
+                <Eye className="w-3.5 h-3.5 text-signal-cyan" />
                 Min. Risk Score Visibility:
               </span>
-              <span className="font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+              <span className="font-mono text-signal-cyan bg-signal-cyan/10 px-2 py-0.5 rounded border border-signal-cyan/30">
                 {minVisibilityRisk === 0 ? 'Show All (0%)' : `≥ ${(minVisibilityRisk * 100).toFixed(0)}%`}
               </span>
             </div>
@@ -362,7 +362,7 @@ export const StreamingMonitorView: React.FC = () => {
               step="0.10"
               value={minVisibilityRisk}
               onChange={(e) => { setMinVisibilityRisk(parseFloat(e.target.value)); setPage(1); }}
-              className="w-full accent-blue-600 cursor-pointer"
+              className="w-full accent-signal-cyan cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-slate-400 font-mono">
               <span>0% (All Traffic)</span>
@@ -374,7 +374,7 @@ export const StreamingMonitorView: React.FC = () => {
           {/* Control 3: Quick Filter Badges */}
           <div className="bg-slate-50 border border-black/[0.06] rounded-2xl p-3.5 space-y-2 flex flex-col justify-between">
             <div className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-              <Filter className="w-3.5 h-3.5 text-purple-600" />
+              <Filter className="w-3.5 h-3.5 text-signal-cyan" />
               Stream Filter Presets:
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -398,17 +398,17 @@ export const StreamingMonitorView: React.FC = () => {
 
       {/* Progress Bar when Simulating */}
       {isSimulating && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 space-y-2">
+        <div className="bg-signal-orange/10 border border-signal-orange/30 rounded-xl p-3.5 space-y-2">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-amber-900 font-bold flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+            <span className="text-signal-orange font-bold flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-signal-orange animate-ping" />
               Streaming In-Memory Ledger: {streamedTxCount.toLocaleString()} / {streamVolume.toLocaleString()} Tx ({dataset === 'synthetic' ? 'Domestic Cybercrime' : 'IBM Multi-Bank'})
             </span>
-            <span className="text-amber-800 font-bold">{progressPercent}%</span>
+            <span className="text-signal-orange font-bold">{progressPercent}%</span>
           </div>
-          <div className="w-full bg-amber-200 h-2 rounded-full overflow-hidden">
+          <div className="w-full bg-signal-orange/20 h-2 rounded-full overflow-hidden">
             <div
-              className="bg-[#FF3D3D] h-full transition-all duration-75"
+              className="bg-signal-orange h-full transition-all duration-75"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -420,12 +420,12 @@ export const StreamingMonitorView: React.FC = () => {
         <div className="bg-white border border-black/[0.06] rounded-2xl shadow-sm p-4">
           <div className="flex items-center justify-between text-slate-500 mb-1">
             <span className="text-[10px] uppercase tracking-wider font-semibold">Ingestion Throughput</span>
-            <Activity className="w-4 h-4 text-[#FF3D3D] animate-pulse" />
+            <Activity className="w-4 h-4 text-signal-orange animate-pulse" />
           </div>
-          <div className="text-2xl font-bold font-mono text-slate-900">
+          <div className="text-2xl font-bold font-mono text-signal-orange">
             {liveRate.toFixed(1)} <span className="text-xs font-normal text-slate-500">Tx/s</span>
           </div>
-          <div className="text-[11px] text-emerald-600 font-mono mt-1 flex items-center gap-1 font-medium">
+          <div className="text-[11px] text-signal-emerald font-mono mt-1 flex items-center gap-1 font-medium">
             <CheckCircle className="w-3.5 h-3.5" />
             <span>Exceeds Target (800+ Tx/s)</span>
           </div>
@@ -434,9 +434,9 @@ export const StreamingMonitorView: React.FC = () => {
         <div className="bg-white border border-black/[0.06] rounded-2xl shadow-sm p-4">
           <div className="flex items-center justify-between text-slate-500 mb-1">
             <span className="text-[10px] uppercase tracking-wider font-semibold">Stage 1 Filter Savings</span>
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <ShieldCheck className="w-4 h-4 text-signal-emerald" />
           </div>
-          <div className="text-2xl font-bold font-mono text-emerald-600">
+          <div className="text-2xl font-bold font-mono text-signal-emerald">
             {filterRate.toFixed(1)}%
           </div>
           <div className="text-[11px] text-slate-500 mt-1">
@@ -447,9 +447,9 @@ export const StreamingMonitorView: React.FC = () => {
         <div className="bg-white border border-black/[0.06] rounded-2xl shadow-sm p-4">
           <div className="flex items-center justify-between text-slate-500 mb-1">
             <span className="text-[10px] uppercase tracking-wider font-semibold">Batch Ingested</span>
-            <Database className="w-4 h-4 text-purple-600" />
+            <Database className="w-4 h-4 text-signal-cyan" />
           </div>
-          <div className="text-2xl font-bold font-mono text-purple-700">
+          <div className="text-2xl font-bold font-mono text-signal-cyan">
             {streamedTxCount.toLocaleString()} <span className="text-xs font-normal text-slate-500">Tx</span>
           </div>
           <div className="text-[11px] text-slate-500 mt-1">
@@ -460,9 +460,9 @@ export const StreamingMonitorView: React.FC = () => {
         <div className="bg-white border border-black/[0.06] rounded-2xl shadow-sm p-4">
           <div className="flex items-center justify-between text-slate-500 mb-1">
             <span className="text-[10px] uppercase tracking-wider font-semibold">Mean GNN Latency</span>
-            <Clock className="w-4 h-4 text-blue-600" />
+            <Clock className="w-4 h-4 text-signal-cyan" />
           </div>
-          <div className="text-2xl font-bold font-mono text-blue-600">
+          <div className="text-2xl font-bold font-mono text-signal-cyan">
             {avgGnnLat.toFixed(2)} <span className="text-xs font-normal text-slate-500">ms</span>
           </div>
           <div className="text-[11px] text-slate-500 mt-1">
@@ -473,9 +473,9 @@ export const StreamingMonitorView: React.FC = () => {
         <div className="bg-white border border-black/[0.06] rounded-2xl shadow-sm p-4">
           <div className="flex items-center justify-between text-slate-500 mb-1">
             <span className="text-[10px] uppercase tracking-wider font-semibold">High-Risk Alerts (≥{(riskCutoff*100).toFixed(0)}%)</span>
-            <ShieldAlert className="w-4 h-4 text-red-500" />
+            <ShieldAlert className="w-4 h-4 text-signal-red" />
           </div>
-          <div className="text-2xl font-bold font-mono text-red-600">
+          <div className="text-2xl font-bold font-mono text-signal-red">
             {dynamicAlertsCount.toLocaleString()}
           </div>
           <div className="text-[11px] text-slate-500 mt-1">
@@ -489,7 +489,7 @@ export const StreamingMonitorView: React.FC = () => {
         <div className="bg-white border border-black/[0.06] rounded-2xl shadow-sm p-5 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2.5 h-2.5 rounded-full bg-signal-orange animate-pulse" />
               <h3 className="text-sm font-bold text-slate-900 uppercase tracking-tight">
                 Live Transaction Stream ({filteredEvents.length.toLocaleString()} of {liveStreamEvents.length.toLocaleString()} matching criteria)
               </h3>
@@ -535,14 +535,14 @@ export const StreamingMonitorView: React.FC = () => {
                     const isHigh = tx.stage_2_risk_probability >= riskCutoff;
                     const isMed = tx.stage_2_risk_probability >= 0.35 && !isHigh;
                     return (
-                      <tr key={idx} className={isHigh ? 'bg-red-50/70 hover:bg-red-100/50' : 'hover:bg-slate-50'}>
+                      <tr key={idx} className={isHigh ? 'bg-red-50/70 hover:bg-red-100/50' : isMed ? 'bg-signal-amber/10 hover:bg-signal-amber/15' : 'hover:bg-slate-50'}>
                         <td className="p-2.5 text-slate-500">{tx.timestamp.substring(0, 19)}</td>
                         <td className="p-2.5 font-bold text-slate-900">{tx.transaction_id}</td>
                         <td className="p-2.5 text-slate-700">{tx.sender_entity_id}</td>
                         <td className="p-2.5 text-slate-700 flex items-center gap-1">
                           {tx.receiver_entity_id}
                           {tx.is_cash_out && (
-                            <span className="text-[9px] px-1 py-0.2 bg-purple-100 text-purple-800 font-bold rounded">
+                            <span className="text-[9px] px-1 py-0.2 bg-signal-exit/15 text-signal-exit font-bold rounded">
                               ATM
                             </span>
                           )}
@@ -552,7 +552,7 @@ export const StreamingMonitorView: React.FC = () => {
                         </td>
                         <td className="p-2.5">
                           {tx.stage_1_flagged ? (
-                            <span className="px-2 py-0.5 text-[9px] font-bold bg-amber-100 text-amber-800 rounded">
+                            <span className="px-2 py-0.5 text-[9px] font-bold bg-signal-amber/15 text-signal-amber rounded">
                               BREACH ({tx.stage_1_reason || 'VELOCITY'})
                             </span>
                           ) : (
@@ -563,12 +563,12 @@ export const StreamingMonitorView: React.FC = () => {
                         </td>
                         <td className="p-2.5">
                           <div className="flex items-center gap-2">
-                            <span className={`font-bold ${isHigh ? 'text-red-600' : isMed ? 'text-amber-600' : 'text-slate-500'}`}>
+                            <span className={`font-bold ${isHigh ? 'text-signal-red' : isMed ? 'text-signal-amber' : 'text-signal-emerald'}`}>
                               {(tx.stage_2_risk_probability * 100).toFixed(1)}%
                             </span>
                             <div className="w-12 bg-slate-200 h-1.5 rounded-full overflow-hidden hidden sm:block">
                               <div
-                                className={`h-full ${isHigh ? 'bg-red-500' : isMed ? 'bg-amber-400' : 'bg-emerald-400'}`}
+                                className={`h-full ${isHigh ? 'bg-signal-red' : isMed ? 'bg-signal-amber' : 'bg-signal-emerald'}`}
                                 style={{ width: `${Math.min(100, tx.stage_2_risk_probability * 100)}%` }}
                               />
                             </div>
@@ -576,15 +576,15 @@ export const StreamingMonitorView: React.FC = () => {
                         </td>
                         <td className="p-2.5">
                           {isHigh ? (
-                            <span className="px-2 py-0.5 text-[9px] font-bold bg-red-600 text-white rounded">
+                            <span className="px-2 py-0.5 text-[9px] font-bold bg-signal-red text-white rounded">
                               🚨 ALERT (HIGH_CONFIDENCE)
                             </span>
                           ) : tx.top_terminal_id && tx.top_terminal_id !== 'NONE' ? (
-                            <span className="text-[10px] text-purple-700 font-bold">
+                            <span className="text-[10px] text-signal-exit font-bold">
                               ➔ {tx.top_terminal_id} ({tx.top_terminal_city})
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 text-[9px] font-bold bg-emerald-100 text-emerald-800 rounded">
+                            <span className="px-2 py-0.5 text-[9px] font-bold bg-signal-emerald/15 text-signal-emerald rounded">
                               NORMAL
                             </span>
                           )}
@@ -656,10 +656,10 @@ export const StreamingMonitorView: React.FC = () => {
         <div className="bg-white border border-black/[0.06] rounded-2xl shadow-sm p-5 space-y-3">
           <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <h3 className="text-xs font-bold text-slate-900 uppercase flex items-center gap-2">
-              <Clock className="w-4 h-4 text-blue-600" />
+              <Clock className="w-4 h-4 text-signal-cyan" />
               Dynamic Subgraph Inference Latency Percentiles (ms)
             </h3>
-            <span className="text-[10px] font-mono text-emerald-600 font-bold">Target SLA: &lt; 50.0ms</span>
+            <span className="text-[10px] font-mono text-signal-emerald font-bold">Target SLA: &lt; 50.0ms</span>
           </div>
 
           <div className="h-56 mt-2">
@@ -688,10 +688,10 @@ export const StreamingMonitorView: React.FC = () => {
         <div className="bg-white border border-black/[0.06] rounded-2xl shadow-sm p-5 space-y-3">
           <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <h3 className="text-xs font-bold text-slate-900 uppercase flex items-center gap-2">
-              <Gauge className="w-4 h-4 text-purple-600" />
+              <Gauge className="w-4 h-4 text-signal-cyan" />
               Temporal Window Horizon vs Model F1-Score (%)
             </h3>
-            <span className="text-[10px] font-mono text-emerald-600 font-bold">72h Optimal Window</span>
+            <span className="text-[10px] font-mono text-signal-emerald font-bold">72h Optimal Window</span>
           </div>
 
           <div className="h-56 mt-2">
@@ -703,7 +703,7 @@ export const StreamingMonitorView: React.FC = () => {
                 <Tooltip
                   contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', borderRadius: '8px', fontSize: '11px', fontFamily: 'monospace', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                 />
-                <Line type="monotone" dataKey="syntheticF1" stroke="#FF3D3D" strokeWidth={2.5} name="Domestic Cybercrime (F1 %)" />
+                <Line type="monotone" dataKey="syntheticF1" stroke="#38BDF8" strokeWidth={2.5} name="Domestic Cybercrime (F1 %)" />
                 <Line type="monotone" dataKey="ibmF1" stroke="#1E1E1E" strokeWidth={2} name="IBM AML Ledger (F1 %)" />
               </LineChart>
             </ResponsiveContainer>

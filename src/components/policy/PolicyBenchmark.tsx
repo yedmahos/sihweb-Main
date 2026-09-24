@@ -69,10 +69,10 @@ export const PolicyBenchmark: React.FC = () => {
   }, [threshold]);
 
   const getOperationalMode = (t: number) => {
-    if (t <= 0.2) return { name: 'HIGH SENSITIVITY // ZERO TOLERANCE', color: 'text-[#C81E1E] border-[#FF3D3D]/20 bg-[#FFF1F1]' };
-    if (t <= 0.5) return { name: 'BALANCED TRIAGE // DEFAULT OPERATIONAL', color: 'text-[#078A22] border-[#FF3D3D]/20 bg-[#E8F7EC]' };
-    if (t <= 0.8) return { name: 'HIGH PRECISION // STRICT EVIDENCE', color: 'text-[#1E1E1E] border-black/[0.08] bg-[#F4F5F7]' };
-    return { name: 'CRITICAL ALERT // AUTOMATED FREEZE ACTION', color: 'text-[#FF3D3D] border-[#FF3D3D]/30 bg-[#FFF1F1]' };
+    if (t <= 0.2) return { name: 'HIGH SENSITIVITY // ZERO TOLERANCE', color: 'text-signal-red border-signal-red/30 bg-signal-red/10', hex: '#EF4444' };
+    if (t <= 0.5) return { name: 'BALANCED TRIAGE // DEFAULT OPERATIONAL', color: 'text-signal-emerald border-signal-emerald/30 bg-signal-emerald/10', hex: '#10B981' };
+    if (t <= 0.8) return { name: 'HIGH PRECISION // STRICT EVIDENCE', color: 'text-signal-amber border-signal-amber/30 bg-signal-amber/10', hex: '#F59E0B' };
+    return { name: 'CRITICAL ALERT // AUTOMATED FREEZE ACTION', color: 'text-signal-red border-signal-red/30 bg-signal-red/10', hex: '#EF4444' };
   };
 
   const mode = getOperationalMode(threshold);
@@ -105,7 +105,7 @@ export const PolicyBenchmark: React.FC = () => {
         <div className="space-y-2 mb-6">
           <div className="flex justify-between text-xs font-bold">
             <span className="text-slate-700">POLICY DECISION THRESHOLD:</span>
-            <span className="text-neon-cyan text-sm text-glow-cyan font-sans">τ = {threshold.toFixed(2)}</span>
+            <span className="text-sm font-sans" style={{ color: mode.hex }}>τ = {threshold.toFixed(2)}</span>
           </div>
 
           <input
@@ -115,7 +115,8 @@ export const PolicyBenchmark: React.FC = () => {
             step="0.05"
             value={threshold}
             onChange={(e) => setThreshold(Number(e.target.value))}
-            className="w-full h-2 bg-[#F4F5F7] rounded-full appearance-none accent-[#FF3D3D] cursor-pointer"
+            className="w-full h-2 bg-[#F4F5F7] rounded-full appearance-none cursor-pointer"
+            style={{ accentColor: mode.hex }}
           />
 
           <div className="flex justify-between text-[9px] text-slate-500 font-sans">
@@ -129,7 +130,7 @@ export const PolicyBenchmark: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
           <div className="p-3 bg-white border border-slate-200">
             <div className="text-[10px] text-slate-500 mb-1">PRECISION:</div>
-            <div className="text-xl font-bold text-neon-cyan">
+            <div className="text-xl font-bold text-signal-cyan">
               {policyData ? `${policyData.precision_percent.toFixed(1)}%` : '--'}
             </div>
             <div className="text-[8px] text-slate-500 mt-1">TRUE POSITIVES / ALERTS</div>
@@ -137,7 +138,7 @@ export const PolicyBenchmark: React.FC = () => {
 
           <div className="p-3 bg-white border border-slate-200">
             <div className="text-[10px] text-slate-500 mb-1">RECALL:</div>
-            <div className="text-xl font-bold text-acid-green">
+            <div className="text-xl font-bold text-signal-cyan">
               {policyData ? `${policyData.recall_percent.toFixed(1)}%` : '--'}
             </div>
             <div className="text-[8px] text-slate-500 mt-1">ILLICIT CAPTURE RATE</div>
@@ -145,7 +146,7 @@ export const PolicyBenchmark: React.FC = () => {
 
           <div className="p-3 bg-white border border-slate-200">
             <div className="text-[10px] text-slate-500 mb-1">F1 OPTIMIZATION:</div>
-            <div className="text-xl font-bold text-amber-cash">
+            <div className="text-xl font-bold text-signal-cyan">
               {policyData ? `${policyData.f1_score_percent.toFixed(1)}%` : '--'}
             </div>
             <div className="text-[8px] text-slate-500 mt-1">HARMONIC MEAN</div>
@@ -153,7 +154,7 @@ export const PolicyBenchmark: React.FC = () => {
 
           <div className="p-3 bg-white border border-slate-200">
             <div className="text-[10px] text-slate-500 mb-1">FALSE POSITIVES:</div>
-            <div className="text-xl font-bold text-crimson-alert">
+            <div className="text-xl font-bold text-signal-amber">
               {policyData ? `${policyData.false_positives} / 200` : '--'}
             </div>
             <div className="text-[8px] text-slate-500 mt-1">UNNECESSARY FREEZES</div>
@@ -164,7 +165,7 @@ export const PolicyBenchmark: React.FC = () => {
         <div className="h-52 w-full bg-white p-2 border border-slate-200">
           <div className="text-[10px] text-slate-500 mb-2 font-bold flex items-center justify-between">
             <span>PRECISION / RECALL / F1 TRADEOFF CURVE (RECHARTS)</span>
-            <span className="text-neon-cyan">τ RANGE: 0.10 - 0.90</span>
+            <span className="text-signal-cyan">τ RANGE: 0.10 - 0.90</span>
           </div>
 
           <ResponsiveContainer width="100%" height="85%">
@@ -175,9 +176,9 @@ export const PolicyBenchmark: React.FC = () => {
               <Tooltip
                 contentStyle={{ backgroundColor: '#05070b', borderColor: '#00E5FF', fontSize: 10 }}
               />
-              <Area type="monotone" dataKey="precision" name="Precision %" stroke="#FF3D3D" fill="#FF3D3D" fillOpacity={0.15} />
-              <Area type="monotone" dataKey="recall" name="Recall %" stroke="#1E1E1E" fill="#1E1E1E" fillOpacity={0.1} />
-              <Area type="monotone" dataKey="f1" name="F1 Score %" stroke="#8A9099" fill="#8A9099" fillOpacity={0.1} />
+              <Area type="monotone" dataKey="precision" name="Precision %" stroke="#38BDF8" fill="#38BDF8" fillOpacity={0.15} />
+              <Area type="monotone" dataKey="recall" name="Recall %" stroke="#22D3EE" fill="#22D3EE" fillOpacity={0.1} />
+              <Area type="monotone" dataKey="f1" name="F1 Score %" stroke="#1E1E1E" fill="#1E1E1E" fillOpacity={0.1} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -217,9 +218,9 @@ export const PolicyBenchmark: React.FC = () => {
                   <td className="p-3 font-bold text-slate-900">{row.dataset}</td>
                   <td className="p-3 text-slate-500 text-[10px]">{row.evaluation_task}</td>
                   <td className="p-3 text-slate-700">{row.xgboost_f1}</td>
-                  <td className="p-3 text-neon-cyan font-bold text-glow-cyan">{row.graphsage_f1}</td>
-                  <td className="p-3 text-acid-green font-bold">{row.f1_delta}</td>
-                  <td className="p-3 text-amber-cash font-bold">{row.pr_auc}</td>
+                  <td className="p-3 text-signal-emerald font-bold">{row.graphsage_f1}</td>
+                  <td className="p-3 text-signal-emerald font-bold">{row.f1_delta}</td>
+                  <td className="p-3 text-signal-cyan font-bold">{row.pr_auc}</td>
                 </tr>
               ))}
             </tbody>
@@ -227,8 +228,8 @@ export const PolicyBenchmark: React.FC = () => {
         </div>
 
         <div className="mt-3 p-2 bg-white border border-slate-200 text-[10px] text-slate-500 flex items-center justify-between">
-          <span>TERMINAL PREDICTION MRR: <span className="text-acid-green font-bold">1.0000 (TOP-1 CASH-OUT ACCURACY: 100.0%)</span></span>
-          <span className="text-amber-cash font-bold">ALL BENCHMARKS EVALUATED ON SYNTHETIC HOLDOUT SUITES</span>
+          <span>TERMINAL PREDICTION MRR: <span className="text-signal-emerald font-bold">1.0000 (TOP-1 CASH-OUT ACCURACY: 100.0%)</span></span>
+          <span className="text-signal-cyan font-bold">ALL BENCHMARKS EVALUATED ON SYNTHETIC HOLDOUT SUITES</span>
         </div>
       </GlassCard>
     </div>

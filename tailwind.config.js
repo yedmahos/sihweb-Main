@@ -51,6 +51,16 @@ export default {
           alert: '#FF3D3D',
         },
         'amber-cash': '#FF3D3D',
+        // Dashboard data semantics. Do not collapse these onto brand red.
+        signal: {
+          orange: '#FF5500',
+          amber: '#F59E0B',
+          red: '#EF4444',
+          emerald: '#10B981',
+          cobalt: '#38BDF8',
+          cyan: '#22D3EE',
+          exit: '#F97316',
+        },
         accent: {
           DEFAULT: '#FF3D3D',
           400: '#FF3D3D',

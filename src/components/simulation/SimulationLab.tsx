@@ -72,7 +72,7 @@ export const SimulationLab: React.FC = () => {
           </div>
           <div className="bg-white border border-black/[0.06] rounded-3xl shadow-sm h-[500px] overflow-hidden relative">
              <div className="absolute top-4 left-4 z-10 bg-white/90 px-3 py-1 rounded shadow text-xs font-bold flex items-center gap-2">
-               <Network className="w-4 h-4 text-purple-500" /> Graph Visualizer
+               <Network className="w-4 h-4 text-signal-cyan" /> Graph Visualizer
              </div>
              <div className="h-full flex flex-col items-center justify-center text-slate-400 p-8 text-center text-sm gap-2">
                 <Network className="w-12 h-12 text-slate-300" />

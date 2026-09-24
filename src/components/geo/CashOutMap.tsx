@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { ApiService } from '../../services/api';
 import { EntityLocation, ConfidenceTier } from '../../types';
+import { SIGNAL } from '../../lib/signal';
 
 interface CashOutMapProps {
   targetEntityId?: string | null;
@@ -127,13 +128,15 @@ export const CashOutMap: React.FC<CashOutMapProps> = ({ targetEntityId, onNaviga
     // 1. Draw Flow Corridors with Animated Dotted Moving Polylines
     CORRIDORS.forEach((corridor) => {
       const isHighRisk = corridor.risk === 'HIGH';
+      const isMediumRisk = corridor.risk === 'MEDIUM';
+      const corridorColor = isHighRisk ? SIGNAL.red : isMediumRisk ? SIGNAL.amber : SIGNAL.exit;
       const isCurrentSelected =
         selectedEntity?.entity_id === corridor.entityId ||
         selectedEntity?.entity_id === corridor.atmId ||
         selectedEntity?.city.toLowerCase().includes(corridor.fromCity.toLowerCase());
 
       const polyline = L.polyline([corridor.from, corridor.to], {
-        color: isHighRisk ? '#FF3D3D' : '#FF3D3D',
+        color: corridorColor,
         weight: isCurrentSelected ? 3.5 : 2.0,
         opacity: isCurrentSelected ? 1.0 : 0.65,
         dashArray: '8, 8',
@@ -141,9 +144,9 @@ export const CashOutMap: React.FC<CashOutMapProps> = ({ targetEntityId, onNaviga
       });
 
       polyline.bindTooltip(
-        `<div style="background:#FFFFFF; border:1px solid ${isHighRisk ? '#FF3D3D' : '#FF3D3D'}; color:#1E1E1E; font-family:Outfit,sans-serif; padding:4px 8px; font-size:10px; border-radius:12px;">
-          <strong style="color:${isHighRisk ? '#FF3D3D' : '#FF3D3D'}">${corridor.fromCity} ➔ ${corridor.toCity}</strong><br/>
-          Corridor Volume: <span style="color:#FF3D3D; font-weight:bold;">${corridor.amount}</span>
+        `<div style="background:#FFFFFF; border:1px solid ${corridorColor}; color:#1E1E1E; font-family:Outfit,sans-serif; padding:4px 8px; font-size:10px; border-radius:12px;">
+          <strong style="color:${corridorColor}">${corridor.fromCity} ➔ ${corridor.toCity}</strong><br/>
+          Corridor Volume: <span style="color:${SIGNAL.exit}; font-weight:bold;">${corridor.amount}</span>
         </div>`,
         { sticky: true, opacity: 0.95 }
       );
@@ -168,24 +171,26 @@ export const CashOutMap: React.FC<CashOutMapProps> = ({ targetEntityId, onNaviga
     filtered.forEach((loc) => {
       const isATM = loc.entity_type === 'ATM_TERMINAL';
       const isHighRisk = loc.confidence_tier === 'HIGH_CONFIDENCE';
+      const isMediumRisk = loc.confidence_tier === 'MEDIUM_CONFIDENCE';
       const isSelected = selectedEntity?.entity_id === loc.entity_id;
+      const color = isHighRisk ? SIGNAL.red : isMediumRisk ? SIGNAL.amber : (isATM ? SIGNAL.exit : SIGNAL.emerald);
+      const selectRing = SIGNAL.orange;
 
       let iconHtml = '';
       if (isATM) {
         iconHtml = `
           <div style="position:relative; width:30px; height:30px; display:flex; align-items:center; justify-content:center;">
-            ${isSelected ? `<div style="position:absolute; width:36px; height:36px; border-radius:12px; border:2px solid #FF3D3D; animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite; opacity:0.6;"></div>` : ''}
-            <div style="width:16px; height:16px; background:#FF3D3D; border:2px solid ${isSelected ? '#FFFFFF' : '#FF3D3D'}; box-shadow:0 0 0 #FF3D3D; border-radius:8px;"></div>
-            <div style="position:absolute; top:-20px; background:#FFFFFF; color:#FF3D3D; border:1px solid #FF3D3D; font-family:Outfit,sans-serif; font-size:9px; font-weight:bold; padding:1px 4px; border-radius:8px; white-space:nowrap; box-shadow:0 8px 20px rgba(30,30,30,0.08);">
+            ${isSelected ? `<div style="position:absolute; width:36px; height:36px; border-radius:12px; border:2px solid ${selectRing}; animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite; opacity:0.6;"></div>` : ''}
+            <div style="width:16px; height:16px; background:${color}; border:2px solid ${isSelected ? '#FFFFFF' : color}; box-shadow:0 0 0 ${color}; border-radius:8px;"></div>
+            <div style="position:absolute; top:-20px; background:#FFFFFF; color:${color}; border:1px solid ${color}; font-family:Outfit,sans-serif; font-size:9px; font-weight:bold; padding:1px 4px; border-radius:8px; white-space:nowrap; box-shadow:0 8px 20px rgba(30,30,30,0.08);">
               ${loc.entity_id}
             </div>
           </div>
         `;
       } else {
-        const color = isHighRisk ? '#FF3D3D' : '#FF3D3D';
         iconHtml = `
           <div style="position:relative; width:30px; height:30px; display:flex; align-items:center; justify-content:center;">
-            ${isHighRisk ? `<div style="position:absolute; width:34px; height:34px; border-radius:50%; border:2px solid #FF3D3D; animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite; opacity:0.6;"></div>` : ''}
+            ${isHighRisk ? `<div style="position:absolute; width:34px; height:34px; border-radius:50%; border:2px solid ${color}; animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite; opacity:0.6;"></div>` : ''}
             <div style="width:14px; height:14px; border-radius:50%; background:${color}; border:2px solid ${isSelected ? '#FFFFFF' : color}; box-shadow:0 0 0 ${color};"></div>
             <div style="position:absolute; top:-20px; background:#FFFFFF; color:${color}; border:1px solid ${color}; font-family:Outfit,sans-serif; font-size:9px; font-weight:bold; padding:1px 4px; border-radius:8px; white-space:nowrap; box-shadow:0 8px 20px rgba(30,30,30,0.08);">
               ${loc.entity_id}
@@ -210,9 +215,9 @@ export const CashOutMap: React.FC<CashOutMapProps> = ({ targetEntityId, onNaviga
 
       marker.bindTooltip(
         `<div style="background:#FFFFFF; border:1px solid #FFFFFF20; color:#1E1E1E; font-family:Outfit,sans-serif; padding:5px 9px; font-size:11px; border-radius:12px;">
-          <div style="color:${isATM ? '#FF3D3D' : '#FF3D3D'}; font-weight:bold;">${loc.entity_id} [${loc.entity_type}]</div>
+          <div style="color:${isATM ? SIGNAL.exit : SIGNAL.cobalt}; font-weight:bold;">${loc.entity_id} [${loc.entity_type}]</div>
           <div style="color:#6B7078;">${loc.holder_name || 'Holder Entity'} · ${loc.city}, ${loc.state}</div>
-          <div style="color:${isHighRisk ? '#FF3D3D' : '#FF3D3D'}; font-weight:bold; margin-top:2px;">
+          <div style="color:${color}; font-weight:bold; margin-top:2px;">
             Risk: ${(loc.risk_probability * 100).toFixed(1)}% [${loc.confidence_tier}]
           </div>
         </div>`,
@@ -248,6 +253,7 @@ export const CashOutMap: React.FC<CashOutMapProps> = ({ targetEntityId, onNaviga
   };
 
   const isHighRisk = selectedEntity?.confidence_tier === 'HIGH_CONFIDENCE';
+  const isMediumRisk = selectedEntity?.confidence_tier === 'MEDIUM_CONFIDENCE';
   const isATM = selectedEntity?.entity_type === 'ATM_TERMINAL';
 
   return (
@@ -302,6 +308,7 @@ export const CashOutMap: React.FC<CashOutMapProps> = ({ targetEntityId, onNaviga
             .map((loc) => {
               const isSelected = selectedEntity?.entity_id === loc.entity_id;
               const isLocATM = loc.entity_type === 'ATM_TERMINAL';
+              const isLocMedium = loc.confidence_tier === 'MEDIUM_CONFIDENCE';
               const isLocHigh = loc.confidence_tier === 'HIGH_CONFIDENCE';
 
               return (
@@ -315,11 +322,11 @@ export const CashOutMap: React.FC<CashOutMapProps> = ({ targetEntityId, onNaviga
                   }`}
                 >
                   <div className="flex items-center justify-between text-[11px] font-bold">
-                    <span className={isLocATM ? 'text-amber-400' : 'text-[#FF3D3D]'}>
+                    <span className={isLocHigh ? 'text-signal-red' : isLocMedium ? 'text-signal-amber' : isLocATM ? 'text-signal-exit' : 'text-signal-cobalt'}>
                       {loc.entity_id}
                     </span>
                     <span className={`text-[9px] px-1 py-0.2 rounded border font-bold ${
-                      isLocHigh ? 'bg-[#FF3D3D]/15 text-[#FF3D3D] border-[#FF3D3D]/30' : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                      isLocHigh ? 'bg-signal-red/15 text-signal-red border-signal-red/30' : isLocMedium ? 'bg-signal-amber/15 text-signal-amber border-signal-amber/30' : 'bg-signal-emerald/15 text-signal-emerald border-signal-emerald/30'
                     }`}>
                       {(loc.risk_probability * 100).toFixed(0)}%
                     </span>
@@ -351,15 +358,15 @@ export const CashOutMap: React.FC<CashOutMapProps> = ({ targetEntityId, onNaviga
         <div className="absolute bottom-3 left-3 right-3 bg-white/90 border border-white/15 p-2 rounded  flex flex-wrap items-center justify-between text-[10px] text-slate-700 font-sans z-[1000]">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FF3D3D]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-signal-red" />
               <span>Critical Mule</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FF3D3D]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-signal-amber" />
               <span>Moderate Mule</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded bg-[#FF3D3D]" />
+              <span className="w-2.5 h-2.5 rounded bg-signal-exit" />
               <span>Cash-Out ATM</span>
             </div>
           </div>
@@ -390,7 +397,7 @@ export const CashOutMap: React.FC<CashOutMapProps> = ({ targetEntityId, onNaviga
               </div>
               <div className="flex justify-between text-slate-500">
                 <span>TYPE:</span>
-                <span className={isATM ? 'text-amber-400 font-bold' : 'text-[#FF3D3D] font-bold'}>
+                <span className={isATM ? 'text-signal-exit font-bold' : 'text-signal-cobalt font-bold'}>
                   {selectedEntity.entity_type}
                 </span>
               </div>
@@ -404,7 +411,7 @@ export const CashOutMap: React.FC<CashOutMapProps> = ({ targetEntityId, onNaviga
               </div>
               <div className="flex justify-between text-slate-500">
                 <span>GPS COORDINATES:</span>
-                <span className="text-slate-500">{selectedEntity.latitude.toFixed(4)}, {selectedEntity.longitude.toFixed(4)}</span>
+                <span className="text-signal-cyan">{selectedEntity.latitude.toFixed(4)}, {selectedEntity.longitude.toFixed(4)}</span>
               </div>
               <div className="flex justify-between text-slate-500 pt-1 border-t border-slate-100">
                 <span>FLAGGED EXPOSURE:</span>
@@ -416,24 +423,24 @@ export const CashOutMap: React.FC<CashOutMapProps> = ({ targetEntityId, onNaviga
             <div className="bg-slate-50 p-3 border border-slate-200 rounded space-y-2">
               <div className="flex justify-between items-baseline">
                 <span className="text-slate-500 text-[10px]">GRAPHSAGE RISK SCORE:</span>
-                <span className="text-xl font-bold font-sans text-slate-900">
+                <span className={`text-xl font-bold font-sans ${isHighRisk ? 'text-signal-red' : isMediumRisk ? 'text-signal-amber' : 'text-signal-emerald'}`}>
                   {(selectedEntity.risk_probability * 100).toFixed(1)}%
                 </span>
               </div>
               <div className="w-full bg-slate-100 h-1.5 rounded overflow-hidden">
                 <div
-                  className={`h-full ${isHighRisk ? 'bg-[#FF3D3D]' : 'bg-emerald-400'}`}
+                  className={`h-full ${isHighRisk ? 'bg-signal-red' : isMediumRisk ? 'bg-signal-amber' : 'bg-signal-emerald'}`}
                   style={{ width: `${selectedEntity.risk_probability * 100}%` }}
                 />
               </div>
-              <div className={`text-[9px] font-bold ${isHighRisk ? 'text-[#FF3D3D]' : 'text-emerald-400'}`}>
+              <div className={`text-[9px] font-bold ${isHighRisk ? 'text-signal-red' : isMediumRisk ? 'text-signal-amber' : 'text-signal-emerald'}`}>
                 {selectedEntity.confidence_tier}
               </div>
             </div>
 
             {/* Suspected Corridor */}
             <div className="bg-slate-50 p-3 border border-slate-200 rounded space-y-1.5">
-              <div className="text-[10px] text-amber-400 font-bold flex items-center gap-1">
+              <div className="text-[10px] text-signal-exit font-bold flex items-center gap-1">
                 <Flame className="w-3 h-3" />
                 <span>SUSPECTED CASH-OUT CORRIDOR:</span>
               </div>

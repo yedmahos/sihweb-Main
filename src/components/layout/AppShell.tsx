@@ -222,8 +222,8 @@ export const AppShell: React.FC<AppShellProps> = ({
           </div>
 
           <div className="hidden xl:flex items-center gap-2">
-            <div className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-white border border-[#FF3D3D]/15 text-[#FF3D3D] text-[11px] font-medium shadow-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#FF3D3D]" />
+            <div className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-white border border-signal-red/30 text-signal-red text-[11px] font-medium shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-signal-red" />
               Threat level DEFCON-2
             </div>
             <div className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-white border border-black/[0.06] text-[11px] text-[#6B7078] shadow-sm">
@@ -231,9 +231,9 @@ export const AppShell: React.FC<AppShellProps> = ({
               <span className="text-[#1E1E1E] font-medium">{activeDataset}</span>
             </div>
             <div className={`flex items-center gap-1.5 h-8 px-3 rounded-full bg-white border text-[11px] font-medium shadow-sm ${
-              backendOnline ? 'border-[#FF3D3D]/20 text-[#078A22]' : 'border-black/[0.06] text-[#6B7078]'
+              backendOnline ? 'border-signal-emerald/40 text-signal-emerald' : 'border-signal-amber/40 text-signal-amber'
             }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${backendOnline ? 'bg-[#FF3D3D]' : 'bg-[#FF3D3D]'}`} />
+              <span className={`w-1.5 h-1.5 rounded-full ${backendOnline ? 'bg-signal-emerald' : 'bg-signal-amber'}`} />
               {backendOnline ? 'API 200 OK' : 'Mock fallback'}
             </div>
           </div>
@@ -258,20 +258,20 @@ export const AppShell: React.FC<AppShellProps> = ({
         <footer className="h-9 mx-3 md:mx-6 mb-3 px-4 rounded-full bg-white border border-black/[0.06] shadow-sm flex items-center justify-between text-[11px] text-[#6B7078] flex-shrink-0 overflow-hidden">
           <div className="flex items-center gap-3 min-w-0">
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#FF3D3D]" />
-              Stream <strong className="text-[#1E1E1E] font-medium">1,448.90 tx/sec</strong>
+              <span className="w-1.5 h-1.5 rounded-full bg-signal-cyan" />
+              Stream <strong className="text-signal-cyan font-medium">1,448.90 tx/sec</strong>
             </span>
             <span className="hidden sm:inline text-black/15">/</span>
-            <span className="hidden sm:inline">Chains <strong className="text-[#FF3D3D] font-medium">48 rings</strong></span>
+            <span className="hidden sm:inline">Chains <strong className="text-signal-amber font-medium">48 rings</strong></span>
             <span className="hidden md:inline text-black/15">/</span>
-            <span className="hidden md:inline">Exposure <strong className="text-[#FF3D3D] font-medium">₹4.82 Cr</strong></span>
+            <span className="hidden md:inline">Exposure <strong className="text-signal-exit font-medium">₹4.82 Cr</strong></span>
           </div>
           <div className="hidden lg:flex items-center gap-3">
-            <span>Graph <strong className="text-[#1E1E1E] font-medium">750 nodes / 5,000 edges</strong></span>
+            <span>Graph <strong className="text-signal-cyan font-medium">750 nodes / 5,000 edges</strong></span>
             <span className="text-black/15">/</span>
-            <span>Policy <strong className="text-[#1E1E1E] font-medium">τ = 0.50</strong></span>
+            <span>Policy <strong className="text-signal-cyan font-medium">τ = 0.50</strong></span>
             <span className="text-black/15">/</span>
-            <span className="text-[#078A22] font-medium">P50 71.67ms · SLA ok</span>
+            <span className="text-signal-emerald font-medium">P50 71.67ms · SLA ok</span>
           </div>
         </footer>
       </div>

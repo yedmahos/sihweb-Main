@@ -11,7 +11,7 @@ import {
   ConfidenceTier
 } from '../types';
 
-const BASE_URL = ((import.meta as any).env?.VITE_API_BASE_URL as string) || '/api';
+const BASE_URL = 'http://localhost:8000/api';
 
 export class ApiService {
   private static backendOnline: boolean = false;

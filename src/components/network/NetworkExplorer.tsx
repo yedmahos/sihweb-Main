@@ -17,6 +17,7 @@ import {
 import { GlassCard } from '../ui/GlassCard';
 import { ConfidenceBadge } from '../ui/ConfidenceBadge';
 import { ApiService } from '../../services/api';
+import { SIGNAL } from '../../lib/signal';
 import { IncidentSummary, GraphStructure, GraphNode, GraphEdge } from '../../types';
 
 export const NetworkExplorer: React.FC = () => {
@@ -26,6 +27,8 @@ export const NetworkExplorer: React.FC = () => {
   const [selectedIncidentId, setSelectedIncidentId] = useState<string>('C000047');
   const [graphData, setGraphData] = useState<GraphStructure | null>(null);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
+  const selectedNodeIdRef = useRef<string | null>(null);
+  selectedNodeIdRef.current = selectedNode?.id ?? null;
   const [searchEntity, setSearchEntity] = useState<string>('');
   const [showLabels, setShowLabels] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
@@ -113,35 +116,37 @@ export const NetworkExplorer: React.FC = () => {
 
       const pos = new THREE.Vector3(x, y, z);
       group.position.copy(pos);
+      group.userData.nodeId = n.id;
+      group.userData.baseColor = n.is_incident ? 0xef4444 : (n.is_terminal || n.node_type === 'ATM') ? 0xf97316 : 0x22d3ee;
       nodePositions.set(n.id, pos);
 
       // Node Geometry
       if (n.is_incident) {
         const mesh = new THREE.Mesh(
           new THREE.OctahedronGeometry(5.5, 0),
-          new THREE.MeshStandardMaterial({ color: 0xff3b4e, emissive: 0xff3b4e, emissiveIntensity: 0.9 })
+          new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0xef4444, emissiveIntensity: 0.9 })
         );
         group.add(mesh);
         const wire = new THREE.Mesh(
           new THREE.IcosahedronGeometry(7.5, 1),
-          new THREE.MeshBasicMaterial({ color: 0xff3b4e, wireframe: true, opacity: 0.4, transparent: true })
+          new THREE.MeshBasicMaterial({ color: 0xef4444, wireframe: true, opacity: 0.4, transparent: true })
         );
         group.add(wire);
       } else if (n.is_terminal || n.node_type === 'ATM') {
         const mesh = new THREE.Mesh(
           new THREE.BoxGeometry(6, 6, 6),
-          new THREE.MeshStandardMaterial({ color: 0xffb000, emissive: 0xffb000, emissiveIntensity: 0.8 })
+          new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xf97316, emissiveIntensity: 0.8 })
         );
         group.add(mesh);
       } else {
         const mesh = new THREE.Mesh(
           new THREE.SphereGeometry(4, 16, 16),
-          new THREE.MeshStandardMaterial({ color: 0x00e5ff, emissive: 0x00e5ff, emissiveIntensity: 0.7 })
+          new THREE.MeshStandardMaterial({ color: 0x22d3ee, emissive: 0x22d3ee, emissiveIntensity: 0.7 })
         );
         group.add(mesh);
         const ring = new THREE.Mesh(
           new THREE.TorusGeometry(5.5, 0.2, 8, 24),
-          new THREE.MeshBasicMaterial({ color: 0x00e5ff, opacity: 0.6, transparent: true })
+          new THREE.MeshBasicMaterial({ color: 0x22d3ee, opacity: 0.6, transparent: true })
         );
         ring.rotation.x = Math.PI / 2;
         group.add(ring);
@@ -167,7 +172,7 @@ export const NetworkExplorer: React.FC = () => {
       const pts = curve.getPoints(25);
       const geom = new THREE.BufferGeometry().setFromPoints(pts);
       const mat = new THREE.LineBasicMaterial({
-        color: e.is_cash_out ? 0xffb000 : 0x00e5ff,
+        color: e.is_cash_out ? 0xf97316 : 0x22d3ee,
         opacity: 0.6,
         transparent: true,
       });
@@ -176,7 +181,7 @@ export const NetworkExplorer: React.FC = () => {
 
     // Animated Particles
     const particleGeom = new THREE.SphereGeometry(0.7, 8, 8);
-    const particleMat = new THREE.MeshBasicMaterial({ color: 0x00ff9d });
+    const particleMat = new THREE.MeshBasicMaterial({ color: 0xff5500 });
     const particles: { mesh: THREE.Mesh; curve: THREE.QuadraticBezierCurve3; progress: number }[] = [];
 
     edgeCurves.forEach((curve) => {
@@ -226,6 +231,15 @@ export const NetworkExplorer: React.FC = () => {
       // Node Rotation
       nodeObjMap.forEach((grp) => {
         grp.rotation.y += 0.01;
+        const active = grp.userData.nodeId === selectedNodeIdRef.current;
+        const hex = active ? Number.parseInt(SIGNAL.orange.slice(1), 16) : (grp.userData.baseColor as number);
+        grp.traverse((obj) => {
+          const mesh = obj as THREE.Mesh;
+          if (!mesh.isMesh || !mesh.material || Array.isArray(mesh.material)) return;
+          const mat = mesh.material as THREE.MeshStandardMaterial;
+          if (mat.color) mat.color.setHex(hex);
+          if (mat.emissive) mat.emissive.setHex(hex);
+        });
       });
 
       // Move Particles
@@ -305,7 +319,7 @@ export const NetworkExplorer: React.FC = () => {
 
           {/* Top HUD Overlay */}
           <div className="absolute top-2 left-2 bg-white/90 px-2.5 py-1 border border-slate-200 text-[10px] text-slate-700 pointer-events-none">
-            NODES: <span className="text-neon-cyan font-bold">{graphData?.num_nodes || 0}</span> | EDGES: <span className="text-neon-cyan font-bold">{graphData?.num_edges || 0}</span>
+            NODES: <span className="text-signal-cyan font-bold">{graphData?.num_nodes || 0}</span> | EDGES: <span className="text-signal-cyan font-bold">{graphData?.num_edges || 0}</span>
           </div>
         </div>
       </div>
@@ -317,7 +331,7 @@ export const NetworkExplorer: React.FC = () => {
             <div className="font-sans text-xs font-medium text-[#1E1E1E]">
               NODE TELEMETRY
             </div>
-            <span className="text-[9px] text-amber-cash bg-amber-500/10 border border-amber-500/30 px-1.5 py-0.5">
+            <span className="text-[9px] text-signal-orange bg-signal-orange/10 border border-signal-orange/30 px-1.5 py-0.5">
               SELECTED
             </span>
           </div>
@@ -326,14 +340,14 @@ export const NetworkExplorer: React.FC = () => {
             <div className="space-y-3 font-sans text-xs">
               <div className="p-2.5 bg-white border border-slate-200">
                 <div className="text-[10px] text-slate-500">ENTITY / ACCOUNT ID:</div>
-                <div className="text-sm font-bold text-neon-cyan">{selectedNode.id}</div>
+                <div className="text-sm font-bold text-signal-cyan">{selectedNode.id}</div>
                 <div className="text-[10px] text-slate-500 mt-0.5">{selectedNode.label}</div>
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex justify-between border-b border-slate-200 pb-1">
                   <span className="text-slate-500">NODE TYPE:</span>
-                  <span className="text-amber-cash font-bold">{selectedNode.node_type}</span>
+                  <span className={`font-bold ${selectedNode.is_terminal ? 'text-signal-exit' : 'text-signal-cyan'}`}>{selectedNode.node_type}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200 pb-1">
                   <span className="text-slate-500">HOP DISTANCE:</span>
@@ -345,26 +359,26 @@ export const NetworkExplorer: React.FC = () => {
                 </div>
                 <div className="flex justify-between border-b border-slate-200 pb-1">
                   <span className="text-slate-500">IN/OUT DEGREE:</span>
-                  <span className="text-neon-cyan">{selectedNode.in_degree} IN / {selectedNode.out_degree} OUT</span>
+                  <span className="text-signal-cyan">{selectedNode.in_degree} IN / {selectedNode.out_degree} OUT</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200 pb-1">
                   <span className="text-slate-500">TOTAL INFLOW:</span>
-                  <span className="text-acid-green font-bold">₹{selectedNode.total_incoming_amount.toLocaleString('en-IN')}</span>
+                  <span className="text-signal-cyan font-bold">₹{selectedNode.total_incoming_amount.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200 pb-1">
                   <span className="text-slate-500">TOTAL OUTFLOW:</span>
-                  <span className="text-crimson-alert font-bold">₹{selectedNode.total_outgoing_amount.toLocaleString('en-IN')}</span>
+                  <span className="text-signal-cyan font-bold">₹{selectedNode.total_outgoing_amount.toLocaleString('en-IN')}</span>
                 </div>
               </div>
 
               {selectedNode.is_incident && (
-                <div className="p-2 bg-red-500/10 border border-crimson-alert text-crimson-alert text-[10px]">
+                <div className="p-2 bg-signal-red/10 border border-signal-red text-signal-red text-[10px]">
                   COMPLAINT ORIGIN SEED ACCOUNT // DISPUTED FUNDS ENTRY POINT
                 </div>
               )}
 
               {selectedNode.is_terminal && (
-                <div className="p-2 bg-amber-500/10 border border-amber-cash text-amber-cash text-[10px]">
+                <div className="p-2 bg-signal-exit/10 border border-signal-exit text-signal-exit text-[10px]">
                   EXIT CASH-OUT TERMINAL // PHYSICAL ATM POINT
                 </div>
               )}

@@ -20,6 +20,7 @@ import { ApiService } from '../../services/api';
 import { PipelineStats, IncidentSummary, IncidentDetail } from '../../types';
 
 import { CommandHeroBanner } from './CommandHeroBanner';
+import { tierBadgeClass, tierBarClass, tierTextClass } from '../../lib/signal';
 import { NavPage } from '../layout/AppShell';
 
 interface CommandCenterProps {
@@ -125,9 +126,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onSelectCase, onNa
         <div className="bg-white border border-black/[0.06] px-5 py-4 rounded-3xl space-y-2 shadow-saas-card">
           <div className="text-[11px] text-[#6B7078] font-medium flex items-center justify-between">
             <span>HIGH-RISK ALERTS</span>
-            <span className="text-[#FF3D3D] font-bold">+14% VEL</span>
+            <span className="text-signal-amber font-bold">+14% VEL</span>
           </div>
-          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-[#EA580C]">
+          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-signal-red">
             {stats ? stats.tier_breakdown.HIGH_CONFIDENCE : '142'}
           </div>
           <div className="text-[10px] text-slate-500">ACTIVE SUSPECT CHAINS</div>
@@ -136,9 +137,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onSelectCase, onNa
         <div className="bg-white border border-black/[0.06] px-5 py-4 rounded-3xl space-y-2 shadow-saas-card">
           <div className="text-[11px] text-[#6B7078] font-medium flex items-center justify-between">
             <span>MULE SYNDICATES</span>
-            <span className="text-amber-400 font-bold">72H WIN</span>
+            <span className="text-signal-cyan font-bold">72H WIN</span>
           </div>
-          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-[#059669]">
+          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-signal-amber">
             48 RINGS
           </div>
           <div className="text-[10px] text-slate-500">COORDINATED GRAPH TOPOLOGY</div>
@@ -147,9 +148,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onSelectCase, onNa
         <div className="bg-white border border-black/[0.06] px-5 py-4 rounded-3xl space-y-2 shadow-saas-card">
           <div className="text-[11px] text-[#6B7078] font-medium flex items-center justify-between">
             <span>CASH-OUT EXPOSURE</span>
-            <span className="text-amber-400 font-bold">PRIORITY</span>
+            <span className="text-signal-orange font-bold">PRIORITY</span>
           </div>
-          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-[#2563EB]">
+          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-signal-exit">
             {formatCurrency(highRiskExposure || 0)}
           </div>
           <div className="text-[10px] text-slate-500">ESTIMATED LAUNDERED SUM</div>
@@ -160,7 +161,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onSelectCase, onNa
             <span>TRIAGE QUEUE</span>
             <span className="text-slate-700 font-bold">SLA &lt; 2H</span>
           </div>
-          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-[#7C3AED]">
+          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-[#1E1E1E]">
             {stats ? stats.tier_breakdown.MEDIUM_CONFIDENCE : '218'}
           </div>
           <div className="text-[10px] text-slate-500">AWAITING INVESTIGATOR</div>
@@ -169,9 +170,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onSelectCase, onNa
         <div className="bg-white border border-black/[0.06] px-5 py-4 rounded-3xl space-y-2 shadow-saas-card">
           <div className="text-[11px] text-[#6B7078] font-medium flex items-center justify-between">
             <span>GNN F1 ACCURACY</span>
-            <span className="text-emerald-400 font-bold">MRR 1.0</span>
+            <span className="text-signal-emerald font-bold">MRR 1.0</span>
           </div>
-          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-[#EA580C]">
+          <div className="text-[30px] leading-none font-medium tracking-tight tabular-nums font-sans text-signal-emerald">
             90.14%
           </div>
           <div className="text-[10px] text-slate-500">GraphSAGE INDUCTIVE TEST</div>
@@ -265,7 +266,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onSelectCase, onNa
                     onClick={() => handleSelectIncident(incident.complaint_id)}
                     className={`p-2.5 transition-all cursor-pointer flex items-center justify-between gap-3 text-xs rounded ${
                       isSelected
-                        ? 'bg-slate-100 border-l-2 border-l-[#FF3D3D] text-slate-900'
+                        ? 'bg-slate-100 border-l-2 border-l-signal-orange text-slate-900'
                         : 'hover:bg-white/[0.03] text-slate-700'
                     }`}
                   >
@@ -275,23 +276,23 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onSelectCase, onNa
                           {incident.complaint_id}
                           {incident.intercepted_in_flight && (
                             <span className="absolute -top-1 -right-1 flex h-1.5 w-1.5">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-signal-cyan opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-signal-cyan"></span>
                             </span>
                           )}
                         </span>
                         <span className={`text-[9px] px-1 py-0.2 rounded font-bold border ${
-                          incident.trigger_source === 'DYNAMIC_ANOMALY' ? 'bg-amber-500/10 text-amber-500 border-amber-500/30' : 'bg-cyan-500/10 text-cyan-400 border-black/[0.06]'
+                          incident.trigger_source === 'DYNAMIC_ANOMALY' ? 'bg-signal-amber/10 text-signal-amber border-signal-amber/30' : 'bg-signal-cyan/10 text-signal-cyan border-signal-cyan/30'
                         }`}>
                           {incident.trigger_source === 'DYNAMIC_ANOMALY' ? 'AUTO' : 'CITIZEN'}
                         </span>
                         <span className={`text-[9px] px-1.5 py-0.2 rounded border font-bold ${
-                          isHigh ? 'bg-[#FF3D3D]/15 text-[#FF3D3D] border-[#FF3D3D]/30' : isMedium ? 'bg-amber-500/15 text-amber-400 border-amber-500/30' : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                          tierBadgeClass(isHigh, isMedium)
                         }`}>
                           {incident.confidence_tier}
                         </span>
                         {incident.top_terminal_city && incident.top_terminal_city !== 'NONE' && (
-                          <span className="text-[9px] text-amber-400">
+                          <span className="text-[9px] text-signal-exit">
                             ➔ {incident.top_terminal_city}
                           </span>
                         )}
@@ -309,12 +310,12 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onSelectCase, onNa
                     </div>
 
                     <div className="w-20 text-right">
-                      <div className={`font-bold text-xs ${isHigh ? 'text-[#FF3D3D]' : isMedium ? 'text-amber-400' : 'text-emerald-400'}`}>
+                      <div className={`font-bold text-xs ${tierTextClass(isHigh, isMedium)}`}>
                         {(incident.graphsage_risk_probability * 100).toFixed(1)}%
                       </div>
                       <div className="w-full h-1 bg-slate-100 rounded mt-0.5 overflow-hidden">
                         <div
-                          className={`h-full ${isHigh ? 'bg-[#FF3D3D]' : isMedium ? 'bg-amber-400' : 'bg-emerald-400'}`}
+                          className={`h-full ${tierBarClass(isHigh, isMedium)}`}
                           style={{ width: `${incident.graphsage_risk_probability * 100}%` }}
                         />
                       </div>
@@ -350,7 +351,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onSelectCase, onNa
               </div>
             </div>
 
-            <span className="text-[9px] bg-[#FF3D3D]/10 border border-[#FF3D3D]/30 text-[#FF3D3D] px-2 py-0.5 rounded font-bold">
+            <span className="text-[9px] bg-signal-amber/10 border border-signal-amber/30 text-signal-amber px-2 py-0.5 rounded font-bold">
               HUMAN REVIEW
             </span>
           </div>
@@ -384,23 +385,23 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onSelectCase, onNa
                 <div className="grid grid-cols-2 gap-2 bg-slate-50 p-3 border border-slate-200 rounded text-[10px]">
                   <div className="space-y-1">
                     <div className="text-slate-500">GRAPHSAGE RISK SCORE:</div>
-                    <div className="text-xl font-bold font-sans text-slate-900">
+                    <div className={`text-xl font-bold font-sans ${tierTextClass(
+                      (selectedIncident?.confidence_tier || incidentDetail.model_prediction.confidence_tier) === 'HIGH_CONFIDENCE',
+                      (selectedIncident?.confidence_tier || incidentDetail.model_prediction.confidence_tier) === 'MEDIUM_CONFIDENCE'
+                    )}`}>
                       {(((selectedIncident?.graphsage_risk_probability !== undefined ? selectedIncident.graphsage_risk_probability : incidentDetail.model_prediction.graphsage_risk_probability) || 0) * 100).toFixed(1)}%
                     </div>
-                    <div className={`text-[9px] font-bold ${
-                      (selectedIncident?.confidence_tier || incidentDetail.model_prediction.confidence_tier) === 'HIGH_CONFIDENCE'
-                        ? 'text-[#FF3D3D]'
-                        : (selectedIncident?.confidence_tier || incidentDetail.model_prediction.confidence_tier) === 'MEDIUM_CONFIDENCE'
-                        ? 'text-amber-400'
-                        : 'text-emerald-400'
-                    }`}>
+                    <div className={`text-[9px] font-bold ${tierTextClass(
+                      (selectedIncident?.confidence_tier || incidentDetail.model_prediction.confidence_tier) === 'HIGH_CONFIDENCE',
+                      (selectedIncident?.confidence_tier || incidentDetail.model_prediction.confidence_tier) === 'MEDIUM_CONFIDENCE'
+                    )}`}>
                       {selectedIncident?.confidence_tier || incidentDetail.model_prediction.confidence_tier}
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <div className="text-slate-500">PREDICTED EXIT TERMINAL:</div>
-                    <div className="text-sm font-bold text-amber-400">
+                    <div className="text-sm font-bold text-signal-exit">
                       {incidentDetail.model_prediction.top_terminal_id && incidentDetail.model_prediction.top_terminal_id !== 'NONE'
                         ? incidentDetail.model_prediction.top_terminal_id
                         : 'N/A'}
@@ -427,13 +428,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({ onSelectCase, onNa
                         ]
                     ).map((bullet, idx) => (
                       <div key={idx} className="flex items-start gap-2 bg-slate-50 p-2 border border-slate-100 rounded">
-                        <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${
-                          incidentDetail.model_prediction.confidence_tier === 'HIGH_CONFIDENCE'
-                            ? 'text-[#FF3D3D]'
-                            : incidentDetail.model_prediction.confidence_tier === 'MEDIUM_CONFIDENCE'
-                            ? 'text-amber-400'
-                            : 'text-emerald-400'
-                        }`} />
+                        <CheckCircle2 className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${tierTextClass(
+                          incidentDetail.model_prediction.confidence_tier === 'HIGH_CONFIDENCE',
+                          incidentDetail.model_prediction.confidence_tier === 'MEDIUM_CONFIDENCE'
+                        )}`} />
                         <span className="leading-snug text-slate-700 font-sans">{bullet}</span>
                       </div>
                     ))}

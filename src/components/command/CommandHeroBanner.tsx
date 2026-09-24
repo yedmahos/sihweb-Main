@@ -43,13 +43,13 @@ export const CommandHeroBanner: React.FC<CommandHeroBannerProps> = ({ onNavigate
         {/* Left: Industrial Intelligence Status */}
         <div className="space-y-2 max-w-2xl font-sans">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="px-2.5 py-1 bg-[#FFF1F1] border border-[#FF3D3D]/15 text-[#FF3D3D] text-[11px] font-medium rounded-full">
+            <span className="px-2.5 py-1 bg-signal-red/10 border border-signal-red/20 text-signal-red text-[11px] font-medium rounded-full">
               DEFCON-2 · Real-time surveillance
             </span>
-            <span className="px-2.5 py-1 bg-[#F4F5F7] border border-black/[0.06] text-[#3D4450] text-[11px] font-medium rounded-full">
+            <span className="px-2.5 py-1 bg-signal-emerald/10 border border-signal-emerald/20 text-signal-emerald text-[11px] font-medium rounded-full">
               GraphSAGE GNN v2.4 operational
             </span>
-            <span className="px-2.5 py-1 bg-[#E8F7EC] border border-[#FF3D3D]/15 text-[#078A22] text-[11px] font-medium rounded-full">
+            <span className="px-2.5 py-1 bg-signal-emerald/10 border border-signal-emerald/20 text-signal-emerald text-[11px] font-medium rounded-full">
               Terminal MRR 1.0000
             </span>
           </div>

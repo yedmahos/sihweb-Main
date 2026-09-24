@@ -55,10 +55,10 @@ export const SystemHealth: React.FC = () => {
   }, []);
 
   const latencyChartData = streaming ? [
-    { name: 'P50 Median', latency: streaming.p50_latency_ms, color: '#00FF9D' },
-    { name: 'P90 90th %ile', latency: streaming.p90_latency_ms || 0, color: '#00E5FF' },
-    { name: 'P95 95th %ile', latency: streaming.p95_latency_ms, color: '#FFB000' },
-    { name: 'P99 99th %ile', latency: streaming.p99_latency_ms, color: '#FF3B4E' },
+    { name: 'P50 Median', latency: streaming.p50_latency_ms, color: '#38BDF8' },
+    { name: 'P90 90th %ile', latency: streaming.p90_latency_ms || 0, color: '#22D3EE' },
+    { name: 'P95 95th %ile', latency: streaming.p95_latency_ms, color: '#38BDF8' },
+    { name: 'P99 99th %ile', latency: streaming.p99_latency_ms, color: '#22D3EE' },
   ] : [];
 
   return (
@@ -87,7 +87,7 @@ export const SystemHealth: React.FC = () => {
           value="71.67 MS"
           label="P50 INFERENCE LATENCY"
           code="LAT-P50"
-          color="green"
+          color="cyan"
           trend={{ direction: 'stable', text: 'SUB-50MS SLA' }}
         />
         <KPICard
@@ -95,7 +95,7 @@ export const SystemHealth: React.FC = () => {
           value="750 / 5,000"
           label="ACTIVE SUBGRAPH SCALE"
           code="GRAPH-NODES"
-          color="amber"
+          color="cyan"
           trend={{ direction: 'stable', text: '72H WINDOW' }}
         />
       </div>
@@ -106,8 +106,8 @@ export const SystemHealth: React.FC = () => {
         <div className="lg:col-span-6 flex flex-col">
           <GlassCard padding="md" glow="cyan" className="flex-1 space-y-3">
             <div className="flex items-center gap-2 border-b border-black/[0.06] pb-2">
-              <Server className="w-4 h-4 text-neon-cyan" />
-              <span className="font-bold text-xs text-neon-cyan uppercase">
+              <Server className="w-4 h-4 text-signal-cyan" />
+              <span className="font-bold text-xs text-signal-cyan uppercase">
                 MODEL PIPELINE & STORAGE RUNTIME
               </span>
             </div>
@@ -115,52 +115,52 @@ export const SystemHealth: React.FC = () => {
             <div className="space-y-2">
               <div className="p-3 bg-white border border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-2.5 h-2.5 bg-acid-green animate-ping" />
+                  <div className="w-2.5 h-2.5 bg-signal-emerald animate-ping" />
                   <div>
                     <div className="font-bold text-slate-900">PyTorch Geometric GraphSAGE</div>
                     <div className="text-[10px] text-slate-500">Inductive Graph Neural Network Engine</div>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 bg-green-500/10 text-acid-green border border-green-500/40 text-[10px] font-bold">
+                <span className="px-2 py-0.5 bg-signal-emerald/10 text-signal-emerald border border-signal-emerald/40 text-[10px] font-bold">
                   LOADED & CALIBRATED
                 </span>
               </div>
 
               <div className="p-3 bg-white border border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-2.5 h-2.5 bg-acid-green rounded-none" />
+                  <div className="w-2.5 h-2.5 bg-signal-emerald rounded-none" />
                   <div>
                     <div className="font-bold text-slate-900">XGBoost Baseline Model</div>
                     <div className="text-[10px] text-slate-500">Tabular Feature Classification Engine</div>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 bg-green-500/10 text-acid-green border border-green-500/40 text-[10px] font-bold">
+                <span className="px-2 py-0.5 bg-signal-emerald/10 text-signal-emerald border border-signal-emerald/40 text-[10px] font-bold">
                   LOADED
                 </span>
               </div>
 
               <div className="p-3 bg-white border border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-2.5 h-2.5 bg-acid-green rounded-none" />
+                  <div className="w-2.5 h-2.5 bg-signal-emerald rounded-none" />
                   <div>
                     <div className="font-bold text-slate-900">SQLite AML Intelligence Database</div>
                     <div className="text-[10px] text-slate-500">1,000 Complaints // 702 Entity Geo Coordinates</div>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 bg-green-500/10 text-acid-green border border-green-500/40 text-[10px] font-bold">
+                <span className="px-2 py-0.5 bg-signal-emerald/10 text-signal-emerald border border-signal-emerald/40 text-[10px] font-bold">
                   CONNECTED
                 </span>
               </div>
 
               <div className="p-3 bg-white border border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-2.5 h-2.5 bg-neon-cyan animate-pulse" />
+                  <div className="w-2.5 h-2.5 bg-signal-orange animate-pulse" />
                   <div>
                     <div className="font-bold text-slate-900">TemporalTransactionGraph Streamer</div>
                     <div className="text-[10px] text-slate-500">72-Hour Rolling Transaction Slide Window</div>
                   </div>
                 </div>
-                <span className="px-2 py-0.5 bg-cyan-500/10 text-neon-cyan border border-black/[0.08] text-[10px] font-bold">
+                <span className="px-2 py-0.5 bg-signal-orange/10 text-signal-orange border border-signal-orange/30 text-[10px] font-bold">
                   STREAMING 1.4K TX/S
                 </span>
               </div>
@@ -173,12 +173,12 @@ export const SystemHealth: React.FC = () => {
           <GlassCard padding="md" glow="cyan" className="flex-1 space-y-3">
             <div className="flex items-center justify-between border-b border-black/[0.06] pb-2">
               <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-neon-cyan" />
-                <span className="font-bold text-xs text-neon-cyan uppercase">
+                <Clock className="w-4 h-4 text-signal-cyan" />
+                <span className="font-bold text-xs text-signal-cyan uppercase">
                   STREAMING QUERY LATENCY PERCENTILES (MS)
                 </span>
               </div>
-              <span className="px-1.5 py-0.5 bg-green-500/15 text-acid-green border border-green-500/40 text-[9px] font-bold">
+              <span className="px-1.5 py-0.5 bg-signal-emerald/15 text-signal-emerald border border-signal-emerald/40 text-[9px] font-bold">
                 SLA COMPLIANT
               </span>
             </div>
@@ -189,7 +189,7 @@ export const SystemHealth: React.FC = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="#EEF0F3" />
                   <XAxis type="number" stroke="#8A9099" tick={{ fontSize: 9 }} />
                   <YAxis type="category" dataKey="name" stroke="#8A9099" tick={{ fontSize: 9 }} width={90} />
-                  <Tooltip contentStyle={{ backgroundColor: '#05070b', borderColor: '#00E5FF', fontSize: 10 }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#05070b', borderColor: '#22D3EE', fontSize: 10 }} />
                   <Bar dataKey="latency" name="Latency (ms)">
                     {latencyChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -201,7 +201,7 @@ export const SystemHealth: React.FC = () => {
 
             <div className="p-2 bg-white border border-slate-200 text-[10px] text-slate-500 flex items-center justify-between">
               <span>95% OF GRAPH INFERENCE QUERIES COMPLETE IN &lt; 105MS</span>
-              <span className="text-neon-cyan font-bold">FAST INFERENCE ARCHITECTURE</span>
+              <span className="text-signal-cyan font-bold">FAST INFERENCE ARCHITECTURE</span>
             </div>
           </GlassCard>
         </div>
